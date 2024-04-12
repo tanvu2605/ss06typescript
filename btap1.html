@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guess the Word</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+    #word-display {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+</style>
+</head>
+<body>
+<h1>Guess the Word Game</h1>
+<div id="word-display"></div>
+<div>
+    <label for="letter-input">Guess a letter: </label>
+    <input type="text" id="letter-input">
+    <button id="guess-button">Guess</button>
+</div>
+<div id="attempts"></div>
+<div id="message"></div>
+<button id="restart-button">Play Again</button>
+
+<script>
+    // Step 1: Lấy random phần tử trong mảng
+    const words = ["tan", "toan", "hung", "hoang", "cuong", "tung", "long", "thang", "thao", "thong"];
+    let word = "";
+    let guessedLetters = [];
+    let attempts = 6;
+
+    function chooseRandomWord() {
+        const index = Math.floor(Math.random() * words.length);
+        return words[index];
+    }
+
+    
+    function setupGame() {
+        word = chooseRandomWord();
+        attempts = word.length + 3; 
+        guessedLetters = [];
+        document.getElementById("attempts").textContent = `Attempts left: ${attempts}`;
+        displayWord();
+    }
+
+    
+    function displayWord() {
+        let display = "";
+        for (const letter of word) {
+            if (guessedLetters.includes(letter)) {
+                display += letter + " ";
+            } else {
+                display += "_ ";
+            }
+        }
+        document.getElementById("word-display").textContent = display;
+    }
+
+    
+    function guessLetter() {
+        const letter = document.getElementById("letter-input").value.toLowerCase();
+        if (!letter.match(/[a-z]/)) {
+            alert("Please enter a valid letter.");
+            return;
+        }
+        if (guessedLetters.includes(letter)) {
+            alert("You've already guessed that letter.");
+            return;
+        }
+        guessedLetters.push(letter);
+        if (!word.includes(letter)) {
+            attempts--;
+            document.getElementById("attempts").textContent = `Attempts left: ${attempts}`;
+        }
+        displayWord();
+        if (checkWin()) {
+            alert("Congratulations! You guessed the word correctly")
+            document.getElementById("message").textContent = `Congratulations! You guessed the word correctly: ${word}`;
+            showRestartButton();
+        } else if (checkLose()) {
+            document.getElementById("message").textContent = `Sorry, you're out of attempts. The word was: ${word}`;
+            showRestartButton();
+        }
+    }
+
+    
+    function checkWin() {
+        return word.split("").every(letter => guessedLetters.includes(letter));
+    }
+
+    function checkLose() {
+        return attempts <= 0;
+    }
+
+    function showRestartButton() {
+        document.getElementById("restart-button").style.display = "block";
+    }
+
+    function restartGame() {
+        document.getElementById("restart-button").style.display = "none";
+        document.getElementById("message").textContent = "";
+        setupGame();
+    }
+
+    window.onload = function() {
+        setupGame();
+        document.getElementById("guess-button").addEventListener("click", guessLetter);
+        document.getElementById("restart-button").addEventListener("click", restartGame);
+    };
+</script>
+</body>
+</html>
